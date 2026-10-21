@@ -1,5 +1,5 @@
 /**
- * Osaka Trip 2026 - Shopping, Luxury, Fashion, Gourmet & CVS Smart Guide (v2.1)
+ * Osaka Trip 2026 - Shopping, Luxury, Fashion, Gourmet & CVS Smart Guide (v2.2)
  * Fast, offline-first Vanilla JS with Geolocation & Calculator
  */
 
@@ -13,7 +13,7 @@ const BASECAMP = {
   mapUrl: "https://www.google.com/maps/search/?api=1&query=DEL+style+Osaka+shinsaibashi+34.6766,135.5015"
 };
 
-// Comprehensive Places Database (33 Curated Spots)
+// Comprehensive Places Database (34 Curated Spots)
 const PLACES = [
   // --- 원스톱 성지 ---
   {
@@ -51,6 +51,26 @@ const PLACES = [
     tips: "★ 숙소에서 도보 4분! 다이마루 3층 연결통로로 파르코와 실내 연결. 단톤, 포터, 노페, 몽벨, 우스하리 잔을 1시간 만에 정복 가능.",
     badge: "숙소 도보 4분",
     directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6738,135.5009"
+  },
+
+  // --- 빅카메라 난바점 ---
+  {
+    id: "shop-bic-camera-namba",
+    name: "빅카메라 (Bic Camera) 난바점",
+    category: "shop",
+    area: "난바 / 센니치마에",
+    floor: "1F~8F 대형 전문몰 (2F 주류/위스키, 3F 약품)",
+    lat: 34.6669,
+    lng: 135.5023,
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=Bic+Camera+Namba+34.6669,135.5023",
+    targetItems: [
+      { name: "산토리 야마자키/하쿠슈 & 닷사이 사케 (2F)", price: "면세 10% + 3% 추가할인" },
+      { name: "가전제품, 카메라, 시계, 뷰티 (1F~5F)", price: "면세 10% + 7% 추가할인" },
+      { name: "의약품, 화장품, 건강식품 (3F)", price: "면세 10% + 5% 추가할인" }
+    ],
+    tips: "난바역 바로 앞 8층 초대형 면세점. '할인·쿠폰' 탭의 인앱 바코드를 계산 시 보여주면 최대 17% 할인!",
+    badge: "최대 17% OFF",
+    directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6669,135.5023"
   },
 
   // --- 단톤, 포터, 오니츠카타이거 전문 매장 ---
@@ -624,8 +644,8 @@ const WISHLIST_ITEMS = [
     name: "산토리 싱글몰트 위스키 (야마자키 / 하쿠슈)",
     spec: "700ml 병",
     price: "정가 약 7,700엔~ (현지 리셀샵 시세 상이)",
-    tip: "리커마운틴 신사이바시점 또는 빅카메라 난바점. 주류 면세 한도 2병(총 2L, $400 이하) 체크.",
-    stores: ["리커마운틴 신사이바시점", "빅카메라 난바점 2F 주류코너"]
+    tip: "빅카메라 난바점 2F 주류코너 또는 리커마운틴. 주류 면세 한도 2병(총 2L, $400 이하) 체크.",
+    stores: ["빅카메라 난바점 2F 주류코너", "리커마운틴 신사이바시점"]
   }
 ];
 
@@ -1166,7 +1186,7 @@ function setupEventListeners() {
     });
   });
 
-  // Modal Open & Close
+  // Phrases Modal Open & Close
   document.getElementById("openPhraseModal").addEventListener("click", () => {
     document.getElementById("phraseModal").classList.add("open");
   });
@@ -1180,6 +1200,30 @@ function setupEventListeners() {
       document.getElementById("phraseModal").classList.remove("open");
     }
   });
+
+  // Bic Camera Coupon Modal Open & Close
+  const openBicBtn = document.getElementById("openBicCouponBtn");
+  if (openBicBtn) {
+    openBicBtn.addEventListener("click", () => {
+      document.getElementById("bicCouponModal").classList.add("open");
+    });
+  }
+
+  const closeBicBtn = document.getElementById("closeBicCouponModal");
+  if (closeBicBtn) {
+    closeBicBtn.addEventListener("click", () => {
+      document.getElementById("bicCouponModal").classList.remove("open");
+    });
+  }
+
+  const bicModal = document.getElementById("bicCouponModal");
+  if (bicModal) {
+    bicModal.addEventListener("click", (e) => {
+      if (e.target.id === "bicCouponModal") {
+        bicModal.classList.remove("open");
+      }
+    });
+  }
 
   // Calculator Inputs
   document.getElementById("calcInputPrice").addEventListener("input", updateCalculator);

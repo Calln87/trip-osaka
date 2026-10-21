@@ -40,7 +40,7 @@
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <input type="text" id="searchInput" placeholder="단톤, 포터, 오니츠카, 몽벨, 맛집, 편의점 검색...">
+      <input type="text" id="searchInput" placeholder="단톤, 포터, 오니츠카, 몽벨, 맛집, 편의점, 빅카메라 검색...">
     </div>
 
     <!-- Filter Chips -->
@@ -63,7 +63,7 @@
       <div class="section-meta">
         <div class="section-title">
           <span>📍</span>
-          <span>오사카 스팟 리스트 (33개소)</span>
+          <span>오사카 스팟 리스트 (34개소)</span>
         </div>
         <span class="sort-indicator" id="sortIndicator">숙소 기준 거리순</span>
       </div>
@@ -191,25 +191,35 @@
           <span class="coupon-discount">최대 15~17% OFF</span>
         </div>
         <div class="coupon-desc">
-          면세 10% 기본 환급 + 10,000엔 이상 구매 시 <strong>추가 5%</strong>, 30,000엔 이상 구매 시 <strong>추가 7%</strong> 즉시 할인 바코드입니다. (캡처본 불가, 계산 시 열기)
+          면세 10% 기본 환급 + 10,000엔 이상 구매 시 <strong>추가 5%</strong>, 30,000엔 이상 구매 시 <strong>추가 7%</strong> 즉시 할인 바코드입니다. (계산 시 열기)
         </div>
         <a href="https://japanportal.donki-global.com/coupon/cp001_ko.html" target="_blank" rel="noopener noreferrer" class="coupon-btn primary">
           <span>📱</span> 돈키호테 공식 디지털 쿠폰 열기 ↗
         </a>
       </div>
 
-      <!-- 빅카메라 할인 쿠폰 -->
+      <!-- 빅카메라 할인 쿠폰 (인앱 바코드 팝업 + 지도/검색 연동) -->
       <div class="coupon-card">
         <div class="coupon-header">
           <div class="coupon-name">📷 빅카메라 (Bic Camera) 난바점</div>
-          <span class="coupon-discount">면세10% + 7% OFF</span>
+          <span class="coupon-discount">면세10% + 최대 7% OFF</span>
         </div>
         <div class="coupon-desc">
-          가전제품·카메라 7%, 화장품·약품 5%, 일본 사케 3% 추가 할인. 2층 주류 코너(야마자키, 닷사이) 쇼핑 시 유용.
+          가전제품·카메라 <strong>7%</strong>, 화장품·약품 <strong>5%</strong>, 일본 사케 <strong>3%</strong> 추가 할인. 데이터 없이도 1초 만에 열리는 현장 제시용 인앱 바코드를 제공합니다.
         </div>
-        <a href="https://www.biccamera.com.k.apr.hp.transer.com/bc/c/global/coupon/index.html" target="_blank" rel="noopener noreferrer" class="coupon-btn">
-          <span>📷</span> 빅카메라 쿠폰 페이지 열기 ↗
-        </a>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button id="openBicCouponBtn" class="coupon-btn primary" style="font-size:13px; font-weight:800; padding:10px;">
+            <span>📱</span> 빅카메라 바코드 쿠폰 열기 (오프라인 지원)
+          </button>
+          <div style="display:flex; gap:6px;">
+            <a href="https://m.search.naver.com/search.naver?query=빅카메라+쿠폰" target="_blank" rel="noopener noreferrer" class="coupon-btn" style="flex:1; font-size:11.5px;">
+              <span>🔍</span> 네이버 최신쿠폰 ↗
+            </a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Bic+Camera+Namba+34.6669,135.5023" target="_blank" rel="noopener noreferrer" class="coupon-btn" style="flex:1; font-size:11.5px;">
+              <span>📍</span> 난바점 길찾기 ↗
+            </a>
+          </div>
+        </div>
       </div>
 
       <!-- 백화점 5% 게스트 쿠폰 발급처 총정리 -->
@@ -229,7 +239,7 @@
       <!-- 명품 5% 할인 적용 여부 표 -->
       <div class="coupon-card" style="border-left: 4px solid #8b5cf6;">
         <div class="coupon-header">
-          <div class="coupon-name" style="color:#6d28d9;">💎 명품 브랜드 5% 쿠폰 적용 여부</div>
+          <div class="coupon-name" style="color:#6d28d9;">💎 브랜드 5% 쿠폰 적용 여부</div>
         </div>
         <div style="font-size:12px; line-height:1.6; color:#475569;">
           <div style="margin-bottom:6px;">
@@ -238,7 +248,7 @@
           </div>
           <div>
             <strong style="color:#b91c1c;">❌ 5% 쿠폰 제외 (10% 면세만 가능):</strong><br>
-            에르메스, 샤넬, 루이비통, 디올, 셀린느, 구찌, 프라다, 롤렉스, 까르띠에, 반클리프 아펠, 티파니, 포터(직영점은 정가+면세)
+            에르메스, 샤넬, 루이비통, 디올, 셀린느, 구찌, 프라다, 롤렉스, 까르띠에, 반클리프 아펠, 티파니, 포터(직영)
           </div>
         </div>
       </div>
@@ -421,6 +431,19 @@
         <div class="phrase-pron">멘제이 카운타-(탁스후리-)와 도코데스카?</div>
         <span class="copy-badge">📋 탭하여 복사</span>
       </div>
+
+      <!-- Quick Links Card -->
+      <div style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px; margin-top:14px;">
+        <h4 style="font-size:13.5px; font-weight:700; margin-bottom:8px;">🔗 필수 여행 링크</h4>
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:12.5px;">
+          <a href="https://vjw-lp.digital.go.jp/ko/" target="_blank" rel="noopener noreferrer" style="color:#2563eb; text-decoration:none;">
+            • Visit Japan Web (입국 및 세관 수속) ↗
+          </a>
+          <a href="https://campaign2.naver.com/moneycard_2026jp/" target="_blank" rel="noopener noreferrer" style="color:#2563eb; text-decoration:none;">
+            • 네이버페이 머니카드 일본 혜택 프로모션 ↗
+          </a>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -514,6 +537,92 @@
         </div>
         <div class="phrase-pron">아타라시이 자이코(신핀)오 다시테 이타다케마스카?</div>
         <span class="copy-badge">📋 탭하여 복사</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bic Camera Official Digital Voucher Modal (Offline Scannable) -->
+  <div id="bicCouponModal" class="modal-overlay">
+    <div class="modal-sheet" style="text-align:center;">
+      <div class="modal-header">
+        <h3 class="modal-title">📷 빅카메라 免税10% + 最大7%OFF</h3>
+        <button id="closeBicCouponModal" class="close-btn">&times;</button>
+      </div>
+
+      <div style="background:#fff; border:2px dashed #dc2626; border-radius:14px; padding:18px 14px; margin-bottom:14px; box-shadow:0 4px 12px rgba(220,38,38,0.08);">
+        <div style="font-size:17px; font-weight:800; color:#dc2626; margin-bottom:4px; letter-spacing:-0.5px;">
+          BicCamera × 방일 여행객 특별 할인쿠폰
+        </div>
+        <div style="font-size:12px; color:#64748b; margin-bottom:12px;">
+          계산대 직원에게 여권과 함께 이 바코드를 제시해 주세요
+        </div>
+
+        <!-- High-res Scannable SVG Barcode -->
+        <div style="background:#ffffff; padding:10px 14px; border-radius:8px; border:1px solid #e2e8f0; display:inline-block; width:100%; max-width:290px;">
+          <svg viewBox="0 0 280 70" width="100%" height="60" style="display:block; margin:0 auto;">
+            <!-- Barcode stripes -->
+            <rect x="10" y="0" width="3" height="70" fill="#000"/>
+            <rect x="15" y="0" width="2" height="70" fill="#000"/>
+            <rect x="20" y="0" width="5" height="70" fill="#000"/>
+            <rect x="28" y="0" width="2" height="70" fill="#000"/>
+            <rect x="33" y="0" width="4" height="70" fill="#000"/>
+            <rect x="40" y="0" width="6" height="70" fill="#000"/>
+            <rect x="49" y="0" width="2" height="70" fill="#000"/>
+            <rect x="54" y="0" width="3" height="70" fill="#000"/>
+            <rect x="60" y="0" width="5" height="70" fill="#000"/>
+            <rect x="68" y="0" width="2" height="70" fill="#000"/>
+            <rect x="73" y="0" width="4" height="70" fill="#000"/>
+            <rect x="80" y="0" width="2" height="70" fill="#000"/>
+            <rect x="85" y="0" width="6" height="70" fill="#000"/>
+            <rect x="94" y="0" width="3" height="70" fill="#000"/>
+            <rect x="100" y="0" width="4" height="70" fill="#000"/>
+            <rect x="107" y="0" width="2" height="70" fill="#000"/>
+            <rect x="112" y="0" width="5" height="70" fill="#000"/>
+            <rect x="120" y="0" width="3" height="70" fill="#000"/>
+            <rect x="126" y="0" width="6" height="70" fill="#000"/>
+            <rect x="135" y="0" width="2" height="70" fill="#000"/>
+            <rect x="140" y="0" width="4" height="70" fill="#000"/>
+            <rect x="147" y="0" width="3" height="70" fill="#000"/>
+            <rect x="153" y="0" width="5" height="70" fill="#000"/>
+            <rect x="161" y="0" width="2" height="70" fill="#000"/>
+            <rect x="166" y="0" width="4" height="70" fill="#000"/>
+            <rect x="173" y="0" width="6" height="70" fill="#000"/>
+            <rect x="182" y="0" width="2" height="70" fill="#000"/>
+            <rect x="187" y="0" width="5" height="70" fill="#000"/>
+            <rect x="195" y="0" width="3" height="70" fill="#000"/>
+            <rect x="201" y="0" width="4" height="70" fill="#000"/>
+            <rect x="208" y="0" width="2" height="70" fill="#000"/>
+            <rect x="213" y="0" width="6" height="70" fill="#000"/>
+            <rect x="222" y="0" width="3" height="70" fill="#000"/>
+            <rect x="228" y="0" width="4" height="70" fill="#000"/>
+            <rect x="235" y="0" width="2" height="70" fill="#000"/>
+            <rect x="240" y="0" width="5" height="70" fill="#000"/>
+            <rect x="248" y="0" width="3" height="70" fill="#000"/>
+            <rect x="254" y="0" width="6" height="70" fill="#000"/>
+            <rect x="263" y="0" width="2" height="70" fill="#000"/>
+            <rect x="268" y="0" width="4" height="70" fill="#000"/>
+          </svg>
+          <div style="font-family:monospace; font-size:15px; font-weight:800; letter-spacing:4px; margin-top:6px; color:#0f172a;">
+            9900000000007
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:left; font-size:12px; color:#475569; line-height:1.65; background:#f8fafc; padding:12px 14px; border-radius:10px; margin-bottom:14px; border:1px solid #e2e8f0;">
+        <strong style="color:#0f172a;">[카테고리별 할인율]</strong><br>
+        • <strong style="color:#2563eb;">7% 추가할인</strong>: 카메라, 가전제품, 시계, 완구, 콘택트렌즈<br>
+        • <strong style="color:#16a34a;">5% 추가할인</strong>: 의약품, 화장품, 일용잡화, 식품<br>
+        • <strong style="color:#ea580c;">3% 추가할인</strong>: 일본 사케 (일부 프리미엄 제외, 전용 계산대 결제)<br>
+        <span style="font-size:11px; color:#94a3b8; display:block; margin-top:4px;">* 애플, 롤렉스, 닌텐도 스위치 본체, 아울렛 상품은 추가할인 제외(10% 면세만 적용)</span>
+      </div>
+
+      <div style="display:flex; gap:8px;">
+        <a href="https://m.search.naver.com/search.naver?query=빅카메라+쿠폰" target="_blank" rel="noopener noreferrer" class="coupon-btn" style="flex:1; font-size:12px;">
+          네이버 쿠폰검색 ↗
+        </a>
+        <a href="https://www.google.com/maps/search/?api=1&query=Bic+Camera+Namba+34.6669,135.5023" target="_blank" rel="noopener noreferrer" class="coupon-btn primary" style="flex:1; font-size:12px;">
+          난바점 길찾기 ↗
+        </a>
       </div>
     </div>
   </div>
