@@ -1,5 +1,5 @@
 /**
- * Osaka Trip 2026 - Shopping, Luxury, Gourmet & Tax-Free Smart Guide (v2.0)
+ * Osaka Trip 2026 - Shopping, Luxury, Fashion, Gourmet & CVS Smart Guide (v2.1)
  * Fast, offline-first Vanilla JS with Geolocation & Calculator
  */
 
@@ -13,24 +13,25 @@ const BASECAMP = {
   mapUrl: "https://www.google.com/maps/search/?api=1&query=DEL+style+Osaka+shinsaibashi+34.6766,135.5015"
 };
 
-// Comprehensive Places Database (28 Curated Spots)
+// Comprehensive Places Database (33 Curated Spots)
 const PLACES = [
   // --- 원스톱 성지 ---
   {
     id: "combo-grand-front",
-    name: "그랜드 프론트 오사카 남관 5F (몽벨+노페 성지)",
+    name: "그랜드 프론트 오사카 남관 (몽벨+노페+단톤+포터 성지)",
     category: "combo",
     area: "우메다 (오사카역 북측)",
-    floor: "남관 5층 (몽벨 & 노스페이스 마주봄)",
+    floor: "남관 3F(포터)·4F(단톤/Bshop)·5F(몽벨/노페)",
     lat: 34.7042,
     lng: 135.4954,
     mapUrl: "https://www.google.com/maps/search/?api=1&query=Grand+Front+Osaka+South+Building+34.7042,135.4954",
     targetItems: [
-      { name: "몽벨 (MontBell Umekita)", price: "로건부츠 7,480엔 / 샤미스 1,760엔" },
-      { name: "노스페이스+ (TNF+ Grand Front)", price: "눕시 부티 10,450엔~ (오사카 최대 매장)" }
+      { name: "5F 몽벨 & 노스페이스+", price: "로건부츠, 눕시 부티 동시 비교" },
+      { name: "4F Bshop (단톤 DANTON 공식)", price: "인너 다운, 플리스 가디건" },
+      { name: "3F KURA CHIKA by PORTER", price: "요시다 포터 탱커 가방" }
     ],
-    tips: "★ 몽벨과 노스페이스가 한 건물 같은 층(남관 5층)에 위치! 한자리에서 사이즈와 디자인을 즉시 비교할 수 있어 쇼핑 피로도가 가장 적음.",
-    badge: "원스톱 성지",
+    tips: "★ 단톤, 포터, 몽벨, 노스페이스가 그랜드프론트 남관 한 건물에 3~5층 연속 배치되어 있어 이동 동선이 가장 효율적!",
+    badge: "올인원 성지",
     directNav: "https://www.google.com/maps/dir/?api=1&destination=34.7042,135.4954"
   },
   {
@@ -38,19 +39,89 @@ const PLACES = [
     name: "다이마루 신사이바시 & 파르코 (숙소 최단 동선)",
     category: "combo",
     area: "신사이바시",
-    floor: "다이마루 6F·8F / 파르코 1F·3F",
+    floor: "파르코 1F(포터/꼼데)·3F(노페)·5F(단톤/Bshop) / 다이마루 6F·8F",
     lat: 34.6738,
     lng: 135.5009,
     mapUrl: "https://www.google.com/maps/search/?api=1&query=Daimaru+Shinsaibashi+34.6738,135.5009",
     targetItems: [
-      { name: "쇼토쿠 우스하리 맥주잔 (8F)", price: "L(375ml) 개당 2,640엔" },
-      { name: "몽벨 (다이마루 6F)", price: "로건부츠 / 방한용품" },
-      { name: "노스페이스 UNLIMITED (파르코 3F)", price: "키즈 눕시 부티 VII" },
-      { name: "꼼데가르송 플레이 (파르코 1F)", price: "가디건, 반팔티 (5% 쿠폰 가능)" }
+      { name: "파르코 5F Bshop (단톤 DANTON)", price: "경량 패딩, 캔버스 백" },
+      { name: "파르코 1F PORTER & 꼼데가르송", price: "탱커 가방, 플레이 라인" },
+      { name: "다이마루 8F 우스하리 잔 & 6F 몽벨", price: "맥주잔 2,640엔, 로건부츠" }
     ],
-    tips: "★ 숙소에서 도보 4분! 다이마루 3층 연결통로를 통해 파르코로 비 안 맞고 실내 이동 가능. 백화점 5% 쿠폰 챙기기.",
+    tips: "★ 숙소에서 도보 4분! 다이마루 3층 연결통로로 파르코와 실내 연결. 단톤, 포터, 노페, 몽벨, 우스하리 잔을 1시간 만에 정복 가능.",
     badge: "숙소 도보 4분",
     directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6738,135.5009"
+  },
+
+  // --- 단톤, 포터, 오니츠카타이거 전문 매장 ---
+  {
+    id: "shop-danton-parco",
+    name: "Bshop 신사이바시 PARCO점 (단톤 DANTON)",
+    category: "shop",
+    area: "신사이바시",
+    floor: "PARCO 5층",
+    lat: 34.6739,
+    lng: 135.5012,
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=Bshop+Shinsaibashi+PARCO+34.6739,135.5012",
+    targetItems: [
+      { name: "단톤 인너 다운 자켓 (경량 패딩)", price: "약 19,000~21,000엔 (면세 10%)" },
+      { name: "단톤 플리스 노칼라 가디건", price: "약 17,000엔대" },
+      { name: "단톤 캔버스 토트백 & 백팩", price: "인기 캐주얼 백" }
+    ],
+    tips: "프랑스 워크웨어 감성 단톤(DANTON)의 일본 최대 공식 셀렉트숍 Bshop. 숙소에서 도보 4분 거리로 재고 확인 용이.",
+    badge: "단톤 공식",
+    directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6739,135.5012"
+  },
+  {
+    id: "shop-porter-parco",
+    name: "PORTER SHINSAIBASHI (요시다 포터)",
+    category: "shop",
+    area: "신사이바시",
+    floor: "PARCO 1층",
+    lat: 34.6739,
+    lng: 135.5012,
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=PORTER+Shinsaibashi+PARCO+34.6739,135.5012",
+    targetItems: [
+      { name: "탱커(TANKER) 헬멧백 / 2WAY 숄더백", price: "대표 인기 시그니처" },
+      { name: "포터 웨이스트백 & 지갑", price: "10% 면세 가능" }
+    ],
+    tips: "요시다 포터 직영 플래그십 매장. 1층 매장이라 접근성이 좋으며 탱커 시리즈 및 한정판 라인업 구비.",
+    badge: "포터 직영",
+    directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6739,135.5012"
+  },
+  {
+    id: "shop-onitsuka-shinsaibashi",
+    name: "오니츠카 타이거 신사이바시 플래그십",
+    category: "shop",
+    area: "신사이바시스지",
+    floor: "1-2층 단독 대형 매장",
+    lat: 34.6732,
+    lng: 135.5011,
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=Onitsuka+Tiger+Shinsaibashi+34.6732,135.5011",
+    targetItems: [
+      { name: "멕시코 66 (MEXICO 66)", price: "약 14,000~16,500엔 (면세 가능)" },
+      { name: "NIPPON MADE (일본 장인 수제 라인)", price: "약 26,000~38,000엔 (프리미엄 가죽)" },
+      { name: "덴티그레 (DENTIGRE) 청키 스니커즈", price: "패션 트렌드 아이템" }
+    ],
+    tips: "간사이 최대 오니츠카 타이거 매장. 일본 장인이 수작업으로 가공한 NIPPON MADE 단독 코너 완비. 숙소 도보 4분.",
+    badge: "오니츠카 본점",
+    directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6732,135.5011"
+  },
+  {
+    id: "shop-onitsuka-namba",
+    name: "오니츠카 타이거 난바 파크스점",
+    category: "shop",
+    area: "난바",
+    floor: "난바파크스 4층",
+    lat: 34.6618,
+    lng: 135.5020,
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=Onitsuka+Tiger+Namba+Parks+34.6618,135.5020",
+    targetItems: [
+      { name: "멕시코 66 SD & 슬립온", price: "인기 스니커즈" }
+    ],
+    tips: "신사이바시 매장에 원하는 색상/사이즈가 없을 때 난바파크스 매장으로 이동해 확인하기 좋음.",
+    badge: "난바 매장",
+    directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6618,135.5020"
   },
 
   // --- 명품 & 하이엔드 / 빈티지 ---
@@ -67,7 +138,7 @@ const PLACES = [
       { name: "생로랑, 보테가베네타, 발렌시아가", price: "⭕ 5% 쿠폰 + 10% 면세 가능" },
       { name: "샤넬, 에르메스, 루이비통 메종, 디올", price: "❌ 5% 제외 (10% 면세만)" }
     ],
-    tips: "숙소 도보 3분! 미도스지 대로변을 따라 루이비통 대형 메종, 샤넬, 까르띠에가 줄지어 있음. 백화점 내 입점 매장은 5% 할인 여부 확인 필수.",
+    tips: "숙소 도보 3분! 미도스지 대로변을 따라 루이비통 대형 메종, 샤넬, 까르띠에가 줄지어 있음. 백화점 1F 안내소에서 5% 쿠폰 수령 필수.",
     badge: "명품거리",
     couponInfo: "brand-check",
     directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6740,135.5005"
@@ -85,7 +156,7 @@ const PLACES = [
       { name: "셀린느, 프라다, 미우미우, 디올", price: "일본 최대 명품 라인업" },
       { name: "1층 안내소 5% 게스트 쿠폰", price: "여권 제시 시 즉시 발급" }
     ],
-    tips: "간사이에서 명품 재고와 신상품이 가장 많은 백화점. 지하 1층 해외고객 서비스 카운터에서 면세 환급 일괄 처리.",
+    tips: "간사이에서 명품 재고와 신상품이 가장 많은 백화점. B1 해외고객 서비스 카운터에서 면세 환급 일괄 처리.",
     badge: "최대 명품관",
     couponInfo: "brand-check",
     directNav: "https://www.google.com/maps/dir/?api=1&destination=34.7025,135.4988"
@@ -125,7 +196,7 @@ const PLACES = [
     directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6720,135.5012"
   },
 
-  // --- 인기 브랜드 & 일반 쇼핑 ---
+  // --- 기존 쇼핑 스팟 ---
   {
     id: "shop-daimaru-shinsaibashi-8f",
     name: "다이마루 신사이바시점 8F 식기판매",
@@ -175,23 +246,6 @@ const PLACES = [
     tips: "난바 지역 최대 몽벨 매장. 아동용 부츠 및 방한 액세서리 재고 확률 높음.",
     badge: "몽벨 대형점",
     directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6640,135.5018"
-  },
-  {
-    id: "shop-onitsuka-shinsaibashi",
-    name: "오니츠카 타이거 신사이바시점",
-    category: "shop",
-    area: "신사이바시",
-    floor: "1-2층 단독 매장",
-    lat: 34.6732,
-    lng: 135.5011,
-    mapUrl: "https://www.google.com/maps/search/?api=1&query=Onitsuka+Tiger+Shinsaibashi+34.6732,135.5011",
-    targetItems: [
-      { name: "NIPPON MADE 핸드메이드 스니커즈", price: "일본 장인 프리미엄 라인" },
-      { name: "멕시코 66 클래식", price: "면세 10% 가능" }
-    ],
-    tips: "한국 미출시 및 일본 한정 컬러 구비. 숙소 도보 4분.",
-    badge: "인기 스니커즈",
-    directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6732,135.5011"
   },
   {
     id: "shop-baobao-daimaru",
@@ -408,7 +462,7 @@ const PLACES = [
     directNav: "https://www.google.com/maps/dir/?api=1&destination=34.6687,135.5042"
   },
 
-  // --- 일정 명소 (USJ 지도보기 100% 정상 작동) ---
+  // --- 일정 명소 ---
   {
     id: "tour-usj",
     name: "유니버셜 스튜디오 재팬 (USJ)",
@@ -417,7 +471,6 @@ const PLACES = [
     floor: "테마파크 전체",
     lat: 34.6654,
     lng: 135.4323,
-    // Guaranteed Google Maps Official Universal Studios Japan URL
     mapUrl: "https://www.google.com/maps/search/?api=1&query=Universal+Studios+Japan+34.6654,135.4323",
     targetItems: [
       { name: "2일차 자유일정 (10/24 토)", price: "슈퍼 닌텐도 월드 / 해리포터" }
@@ -495,6 +548,30 @@ const PLACES = [
 // Shopping Targets for Wishlist Tab
 const WISHLIST_ITEMS = [
   {
+    id: "wish-danton",
+    name: "단톤 (DANTON) 인너 다운 자켓 / 플리스",
+    spec: "남녀공용 경량 패딩 / 노칼라 플리스 가디건",
+    price: "약 17,000~21,000엔 (세전)",
+    tip: "신사이바시 PARCO 5F Bshop 또는 그랜드프론트 남관 4F Bshop. 핏이 슬림하고 보온성이 좋아 간절기 및 이너로 최고 인기.",
+    stores: ["Bshop 신사이바시 PARCO 5F (숙소 도보 4분)", "Bshop 그랜드 프론트 남관 4F", "Bshop 난바 파크스 3F"]
+  },
+  {
+    id: "wish-porter",
+    name: "요시다 포터 (PORTER) 탱커 숄더 / 헬멧백",
+    spec: "탱커(TANKER) 시그니처 나일론 오렌지 안감 라인",
+    price: "정가 판매 (10% 면세 적용)",
+    tip: "신사이바시 PARCO 1F 직영 매장. 내구성 극강의 클래식 캐주얼 백. 현지 매장에서 실물 착용 후 구매 추천.",
+    stores: ["PORTER SHINSAIBASHI (파르코 1F)", "KURA CHIKA 그랜드프론트 남관 3F", "난바 다카시마야 2F"]
+  },
+  {
+    id: "wish-onitsuka",
+    name: "오니츠카 타이거 멕시코 66 / NIPPON MADE",
+    spec: "MEXICO 66 (실버/골드/화이트) 또는 수제 NIPPON MADE",
+    price: "멕시코66 약 15,000엔대 / NIPPON MADE 약 30,000엔대",
+    tip: "신사이바시 플래그십 매장(도보 4분). 착화감이 매우 가볍고 편안함. 일본 한정 컬러 체크 필수.",
+    stores: ["오니츠카 타이거 신사이바시 플래그십", "오니츠카 타이거 난바 파크스 4F"]
+  },
+  {
     id: "wish-glass",
     name: "쇼토쿠 우스하리 맥주잔 (松徳硝子 うすはり)",
     spec: "L사이즈 (375ml) x 2개",
@@ -552,6 +629,135 @@ const WISHLIST_ITEMS = [
   }
 ];
 
+// Convenience Store (CVS) Database
+const CVS_DATA = {
+  seven: {
+    brand: "세븐일레븐 (7-Eleven)",
+    badge: "디저트 & 스무디 명가",
+    class: "seven",
+    items: [
+      {
+        name: "세븐카페 즉석 블렌딩 스무디",
+        jp: "お店で作る スムージー",
+        price: "약 300엔",
+        tag: "음료/혁신",
+        tagClass: "tag-drink",
+        desc: "냉동 컵을 골라 계산 후 전용 블렌더 머신에 바코드를 찍고 갈아먹는 즉석 스무디! 딸기바나나소이 & 그린스무디 추천."
+      },
+      {
+        name: "타마고 산도 (달걀 샌드위치)",
+        jp: "たっぷりたまごサンド",
+        price: "약 250엔",
+        tag: "식사/간식",
+        tagClass: "tag-hot",
+        desc: "흰 식빵 사이에 고소하고 부드러운 에그 마요 샐러드가 꽉 찬 편의점 샌드위치의 근본."
+      },
+      {
+        name: "오하요 쟈지우유 브륄레 아이스크림",
+        jp: "オハヨー ブリュレ (BRULEE)",
+        price: "약 365엔",
+        tag: "디저트 1위",
+        tagClass: "tag-dessert",
+        desc: "바삭하게 구워진 설탕 캐러멜 토핑을 숟가락으로 톡 깨서 진한 쟈지우유 밀크 아이스크림과 함께 먹는 환상의 조합."
+      },
+      {
+        name: "쟈지우유 푸딩 (Jersey Milk Pudding)",
+        jp: "ジャージー牛乳プリン",
+        price: "약 170엔",
+        tag: "디저트",
+        tagClass: "tag-dessert",
+        desc: "윗면의 부드러운 크림과 아래의 진한 밀크 푸딩이 녹아내리는 국민 푸딩."
+      },
+      {
+        name: "세븐 프리미엄 랑그드샤 화이트초코",
+        jp: "ラングドシャ ホワイトチョコ",
+        price: "약 192엔",
+        tag: "과자/선물",
+        tagClass: "tag-dessert",
+        desc: "시로이 코이비토와 맛이 95% 흡사한 가성비 최고의 고급 쿠키 과자."
+      }
+    ]
+  },
+  lawson: {
+    brand: "로손 (Lawson)",
+    badge: "모찌롤 & 튀김 성지",
+    class: "lawson",
+    items: [
+      {
+        name: "가라아게군 (Karaage-kun 치킨)",
+        jp: "からあげクン (レッド / レギュラー)",
+        price: "약 238엔 (5개입)",
+        tag: "즉석 핫도그",
+        tagClass: "tag-hot",
+        desc: "로손 카운터 옆 온장고의 전설적인 치킨너겟. 매콤한 '레드'맛과 고소한 '치즈'맛이 맥주 안주로 극상."
+      },
+      {
+        name: "우치카페 모찌롤 (Mochi Roll Cake)",
+        jp: "もち食感ロール (北海道産生クリーム)",
+        price: "약 343엔 (6조각)",
+        tag: "디저트 1위",
+        tagClass: "tag-dessert",
+        desc: "빵 시트가 떡처럼 쫄깃쫄깃하고 신선한 홋카이도 생크림이 가득 찬 로손의 대표 효자템."
+      },
+      {
+        name: "프리미엄 롤케이크",
+        jp: "プレミアムロールケーキ",
+        price: "약 194엔",
+        tag: "디저트",
+        tagClass: "tag-dessert",
+        desc: "숟가락으로 떠먹는 순백의 우유 생크림 롤케이크. 편의점 수준을 뛰어넘은 퀄리티."
+      },
+      {
+        name: "바스크 치즈케이크 (Baschee)",
+        jp: "バスチー (バスク風チーズケーキ)",
+        price: "약 243엔",
+        tag: "치즈케이크",
+        tagClass: "tag-dessert",
+        desc: "겉은 노릇하게 그을리고 속은 크리미하게 녹아내리는 진한 치즈 풍미."
+      }
+    ]
+  },
+  fami: {
+    brand: "패밀리마트 (FamilyMart)",
+    badge: "파미치키 & 수플레 푸딩",
+    class: "fami",
+    items: [
+      {
+        name: "파미치키 (Famichiki 뼈없는 순살 치킨)",
+        jp: "ファミチキ",
+        price: "약 220엔",
+        tag: "치킨 1위",
+        tagClass: "tag-hot",
+        desc: "한입 베어 물면 뜨거운 육즙이 터져 나오는 바삭하고 짭조름한 일본 편의점 즉석치킨의 최강자."
+      },
+      {
+        name: "수플레 푸딩 (Souffle Pudding)",
+        jp: "スフレ・プリン",
+        price: "약 320엔",
+        tag: "디저트 1위",
+        tagClass: "tag-dessert",
+        desc: "탱글하고 달콤한 커스터드 푸딩 위에 두툼하고 촉촉한 치즈 수플레 케이크를 통째로 얹은 디저트."
+      },
+      {
+        name: "패미마 프라페 (Famima Frappe)",
+        jp: "ファミマフラッペ",
+        price: "약 330~350엔",
+        tag: "음료",
+        tagClass: "tag-drink",
+        desc: "냉동 컵을 주물러 얼음을 깬 후 매장 커피 머신에서 따뜻한 우유를 부어 빨대로 저어 마시는 프라페."
+      },
+      {
+        name: "크리스피 치킨 (하바네로 핫)",
+        jp: "クリスピーチキン (ハバネロホット)",
+        price: "약 178엔",
+        tag: "스낵",
+        tagClass: "tag-hot",
+        desc: "닭가슴살을 매콤하고 극도로 바삭하게 튀겨내 부담 없이 즐기기 좋은 핫 스낵."
+      }
+    ]
+  }
+};
+
 // App State
 let userCoords = null;
 let useGpsMode = false;
@@ -602,6 +808,7 @@ function initApp() {
   setupEventListeners();
   renderPlaces();
   renderWishlist();
+  renderConvenienceStore();
   updateCalculator();
   tryAutoGps();
 }
@@ -791,6 +998,40 @@ function renderPlaces() {
   }).join("");
 }
 
+// Render Convenience Store Tab
+function renderConvenienceStore() {
+  const container = document.getElementById("cvsContainer");
+  if (!container) return;
+
+  const brands = [CVS_DATA.seven, CVS_DATA.lawson, CVS_DATA.fami];
+
+  container.innerHTML = brands.map(b => `
+    <div class="cvs-brand-card">
+      <div class="cvs-header ${b.class}">
+        <span>${b.brand}</span>
+        <span style="font-size:12px; font-weight:600; opacity:0.9;">${b.badge}</span>
+      </div>
+      <div class="cvs-item-list">
+        ${b.items.map(it => `
+          <div class="cvs-item">
+            <div class="cvs-item-title-row">
+              <span class="cvs-item-name">${it.name}</span>
+              <span class="cvs-item-tag ${it.tagClass}">${it.tag}</span>
+            </div>
+            <div class="cvs-item-jp" onclick="copyText('${it.jp}')" title="탭하여 일본어 복사">
+              ${it.jp} <span style="font-size:10px; color:#2563eb;">📋</span>
+            </div>
+            <div style="font-size:12px; font-weight:700; color:#dc2626; margin-bottom:3px;">
+              ${it.price}
+            </div>
+            <div class="cvs-item-desc">${it.desc}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
 // Toggle Bookmark
 window.toggleBookmark = function(id) {
   if (bookmarks.has(id)) {
@@ -863,10 +1104,8 @@ function updateCalculator() {
   let taxRefund = 0;
   let handlingFee = 0;
   if (calcState.useTaxFree && currentPrice > 0) {
-    // 세금 10% 환급 (세전 금액 기준 환급: price / 1.10 * 0.10)
     taxRefund = (currentPrice / 1.10) * 0.10;
 
-    // 백화점 면세 수수료 1.55%
     if (calcState.deductFee) {
       handlingFee = (currentPrice / 1.10) * 0.0155;
       taxRefund = taxRefund - handlingFee;
@@ -876,7 +1115,6 @@ function updateCalculator() {
   const finalJpy = Math.max(0, currentPrice - taxRefund);
   const finalKrw = Math.round(finalJpy * (calcState.rate));
 
-  // Render to DOM
   document.getElementById("calcResultJpy").textContent = `${Math.round(finalJpy).toLocaleString()}엔`;
   document.getElementById("calcResultKrw").textContent = `약 ${finalKrw.toLocaleString()}원`;
   document.getElementById("calcCouponDiscount").textContent = `-${Math.round(couponDiscount).toLocaleString()}엔`;
@@ -921,7 +1159,8 @@ function setupEventListeners() {
       tabViews.forEach(v => v.classList.remove("active"));
 
       item.classList.add("active");
-      document.getElementById(targetTab).classList.add("active");
+      const targetEl = document.getElementById(targetTab);
+      if (targetEl) targetEl.classList.add("active");
 
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -989,7 +1228,7 @@ function showToast(msg) {
 // Copy to clipboard helper
 window.copyText = function(text) {
   navigator.clipboard.writeText(text).then(() => {
-    showToast("📋 일본어 문구가 복사되었습니다.");
+    showToast("📋 일본어가 복사되었습니다.");
   }).catch(() => {
     showToast(text);
   });
