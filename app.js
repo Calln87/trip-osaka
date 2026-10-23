@@ -786,6 +786,12 @@ let searchQuery = "";
 let bookmarks = new Set(JSON.parse(localStorage.getItem("trip_osaka_bookmarks") || "[]"));
 let purchasedItems = new Set(JSON.parse(localStorage.getItem("trip_osaka_purchased") || "[]"));
 
+// GPS Tracking State
+let gpsWatchId = null;
+let lastGpsTimestamp = null;
+let isGpsFetching = false;
+let gpsTimerInterval = null;
+
 // Calculator State
 let calcState = {
   price: 10000,
@@ -795,7 +801,7 @@ let calcState = {
   rate: 9.20 // 100엔당 920원 (엔화 1엔 = 9.2원)
 };
 
-// Haversine Formula for distance (km)
+// Haversine Formula for straight-line distance (km)
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371; // Earth's radius in km
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -808,11 +814,52 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-function formatDistance(distKm) {
-  if (distKm < 1) {
-    return `${Math.round(distKm * 1000)}m`;
+// Convert straight-line distance to realistic Osaka pedestrian walk distance & time
+function getDistanceDisplay(straightKm) {
+  if (straightKm > 6) {
+    const sStr = straightKm < 1 ? `${Math.round(straightKm * 1000)}m` : `${straightKm.toFixed(1)}km`;
+    return {
+      walkText: `직선 ${sStr}`,
+      detailText: "차량 / 지하철 이동 권장",
+      isFar: true
+    };
   }
-  return `${distKm.toFixed(1)}km`;
+
+  // Realistic pedestrian detour in urban grid (approx 1.35x detour factor)
+  const walkKm = straightKm * 1.35;
+  const walkMeters = Math.round(walkKm * 1000);
+  const walkMinutes = Math.max(1, Math.round(walkMeters / 80)); // 80m/min standard
+
+  const walkStr = walkKm < 1 ? `${walkMeters}m` : `${walkKm.toFixed(1)}km`;
+  const straightStr = straightKm < 1 ? `${Math.round(straightKm * 1000)}m` : `${straightKm.toFixed(1)}km`;
+
+  return {
+    walkText: `도보 약 ${walkStr} (${walkMinutes}분)`,
+    detailText: `직선 ${straightStr} 기준`,
+    isFar: false
+  };
+}
+
+// Detect approximate location in Osaka
+function detectAreaName(lat, lng) {
+  const spots = [
+    { name: "숙소(DEL style) 인근", lat: 34.6766, lng: 135.5015, radius: 0.2 },
+    { name: "신사이바시 / 미도스지", lat: 34.6740, lng: 135.5010, radius: 0.5 },
+    { name: "도톤보리 / 에비스다리", lat: 34.6690, lng: 135.5015, radius: 0.5 },
+    { name: "난바역 / 센니치마에", lat: 34.6645, lng: 135.5018, radius: 0.6 },
+    { name: "구로몬 시장", lat: 34.6657, lng: 135.5074, radius: 0.4 },
+    { name: "오사카성 공원", lat: 34.6873, lng: 135.5262, radius: 1.0 },
+    { name: "우메다 / 오사카역", lat: 34.7030, lng: 135.4970, radius: 1.0 },
+    { name: "USJ (유니버셜 스튜디오)", lat: 34.6654, lng: 135.4323, radius: 1.2 },
+    { name: "간사이 국제공항", lat: 34.4320, lng: 135.2304, radius: 3.0 }
+  ];
+
+  for (const s of spots) {
+    if (calculateDistance(lat, lng, s.lat, s.lng) <= s.radius) {
+      return s.name;
+    }
+  }
+  return "오사카 시내";
 }
 
 // Current Origin Coordinates
@@ -830,74 +877,175 @@ function initApp() {
   renderWishlist();
   renderConvenienceStore();
   updateCalculator();
-  tryAutoGps();
+  startContinuousGps();
 }
 
-function tryAutoGps() {
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(
+// Continuous GPS Engine (watchPosition + periodic refresh)
+function startContinuousGps() {
+  if (!("geolocation" in navigator)) {
+    updateGpsUi(false, "위치 서비스 미지원");
+    return;
+  }
+
+  // 1. Initial High-accuracy fetch
+  fetchCurrentGps(false);
+
+  // 2. Continuous watchPosition
+  const gpsOptions = {
+    enableHighAccuracy: true,
+    maximumAge: 0, // Always request fresh hardware fix
+    timeout: 10000
+  };
+
+  try {
+    gpsWatchId = navigator.geolocation.watchPosition(
       (pos) => {
-        userCoords = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
-        };
-        useGpsMode = true;
-        updateGpsButtonState(true);
-        renderPlaces();
-        showToast("📍 내 GPS 위치가 연동되었습니다.");
+        handleNewGpsPosition(pos, false);
       },
       (err) => {
-        console.warn("GPS access denied or unavailable, using Hotel as base:", err.message);
-        useGpsMode = false;
-        updateGpsButtonState(false);
-        renderPlaces();
+        handleGpsError(err);
       },
-      { enableHighAccuracy: true, timeout: 7000 }
+      gpsOptions
     );
+  } catch (e) {
+    console.warn("watchPosition failed to initialize:", e);
+  }
+
+  // 3. Periodic interval (every 10 seconds) to ensure GPS doesn't sleep while walking
+  if (!gpsTimerInterval) {
+    gpsTimerInterval = setInterval(() => {
+      if (useGpsMode && document.visibilityState === "visible") {
+        fetchCurrentGps(false);
+      }
+      updateTimeAgoDisplay();
+    }, 10000);
   }
 }
 
-function updateGpsButtonState(active) {
-  const btn = document.getElementById("gpsToggleBtn");
-  const label = document.getElementById("gpsBtnLabel");
-  const sortIndicator = document.getElementById("sortIndicator");
+function fetchCurrentGps(isManual = false, callback = null) {
+  if (!("geolocation" in navigator)) {
+    if (callback) callback();
+    return;
+  }
 
-  if (active) {
-    btn.classList.add("active");
-    label.textContent = "내 GPS 연동 중";
-    sortIndicator.textContent = "내 위치 기준 거리순";
+  isGpsFetching = true;
+  const refreshBtn = document.getElementById("gpsRefreshBtn");
+  if (refreshBtn && isManual) refreshBtn.classList.add("spinning");
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      isGpsFetching = false;
+      if (refreshBtn) refreshBtn.classList.remove("spinning");
+      handleNewGpsPosition(pos, isManual);
+      if (callback) callback();
+    },
+    (err) => {
+      isGpsFetching = false;
+      if (refreshBtn) refreshBtn.classList.remove("spinning");
+      handleGpsError(err, isManual);
+      if (callback) callback();
+    },
+    { enableHighAccuracy: true, maximumAge: 0, timeout: 8000 }
+  );
+}
+
+function handleNewGpsPosition(pos, isManual = false) {
+  const lat = pos.coords.latitude;
+  const lng = pos.coords.longitude;
+  const accuracy = Math.round(pos.coords.accuracy || 0);
+
+  userCoords = { lat, lng, accuracy };
+  useGpsMode = true;
+  lastGpsTimestamp = new Date();
+
+  updateGpsUi(true);
+  renderPlaces();
+
+  if (isManual) {
+    const areaName = detectAreaName(lat, lng);
+    showToast(`📍 위치 갱신 완료: ${areaName} (오차 ±${accuracy}m)`);
+  }
+}
+
+function handleGpsError(err, isManual = false) {
+  console.warn("GPS lookup error:", err.code, err.message);
+  
+  if (!userCoords) {
+    useGpsMode = false;
+    updateGpsUi(false);
+    renderPlaces();
+  }
+
+  if (isManual) {
+    if (err.code === 1) {
+      showToast("⚠️ 브라우저 위치 권한을 '허용'해 주세요.");
+    } else {
+      showToast("⚠️ GPS 수신이 일시적으로 지연되고 있습니다. 다시 시도해 주세요.");
+    }
+  }
+}
+
+function updateGpsUi(active) {
+  const toggleBtn = document.getElementById("gpsToggleBtn");
+  const toggleLabel = document.getElementById("gpsBtnLabel");
+  const sortIndicator = document.getElementById("sortIndicator");
+  const banner = document.getElementById("locationStatusBanner");
+  const bannerIcon = document.getElementById("locationStatusIcon");
+  const bannerMain = document.getElementById("locationStatusMain");
+  const bannerSub = document.getElementById("locationStatusSub");
+
+  if (active && userCoords) {
+    if (toggleBtn) toggleBtn.classList.add("active");
+    if (toggleLabel) toggleLabel.textContent = "내 GPS 연동 중";
+    if (sortIndicator) sortIndicator.textContent = "내 위치 기준 거리순 (도보 보정)";
+
+    if (banner) {
+      banner.className = "location-banner gps-active";
+    }
+    if (bannerIcon) bannerIcon.textContent = "📍";
+    
+    const area = detectAreaName(userCoords.lat, userCoords.lng);
+    if (bannerMain) bannerMain.textContent = `현재 위치: ${area} (정확도 ±${userCoords.accuracy}m)`;
+    if (bannerSub) bannerSub.textContent = `실제 골목길 도보 거리(약 1.35배)로 자동 계산 중`;
+    updateTimeAgoDisplay();
   } else {
-    btn.classList.remove("active");
-    label.textContent = "숙소 기준 거리";
-    sortIndicator.textContent = "숙소(DEL style) 기준 거리순";
+    if (toggleBtn) toggleBtn.classList.remove("active");
+    if (toggleLabel) toggleLabel.textContent = "숙소 기준 거리";
+    if (sortIndicator) sortIndicator.textContent = "숙소(DEL style) 기준 거리순";
+
+    if (banner) {
+      banner.className = "location-banner hotel-mode";
+    }
+    if (bannerIcon) bannerIcon.textContent = "🏨";
+    if (bannerMain) bannerMain.textContent = "숙소(DEL style 신사이바시) 기준 거리";
+    if (bannerSub) bannerSub.textContent = "[GPS 연동] 버튼을 누르면 내 실시간 위치로 계산됩니다";
+    
+    const timeEl = document.getElementById("gpsLastUpdateTime");
+    if (timeEl) timeEl.textContent = "";
+  }
+}
+
+function updateTimeAgoDisplay() {
+  const timeEl = document.getElementById("gpsLastUpdateTime");
+  if (!timeEl || !lastGpsTimestamp || !useGpsMode) return;
+
+  const seconds = Math.floor((new Date() - lastGpsTimestamp) / 1000);
+  if (seconds < 15) {
+    timeEl.textContent = "방금 갱신";
+  } else if (seconds < 60) {
+    timeEl.textContent = `${seconds}초 전 갱신`;
+  } else {
+    const mins = Math.floor(seconds / 60);
+    timeEl.textContent = `${mins}분 전 갱신`;
   }
 }
 
 function toggleGps() {
   if (!useGpsMode) {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          useGpsMode = true;
-          updateGpsButtonState(true);
-          renderPlaces();
-          showToast("📍 내 GPS 실시간 거리순으로 정렬되었습니다.");
-        },
-        (err) => {
-          showToast("⚠️ 위치 권한이 꺼져 있어 숙소 기준으로 유지됩니다.");
-          useGpsMode = false;
-          updateGpsButtonState(false);
-          renderPlaces();
-        },
-        { enableHighAccuracy: true }
-      );
-    } else {
-      showToast("이 기기에서 위치 서비스를 지원하지 않습니다.");
-    }
+    fetchCurrentGps(true);
   } else {
     useGpsMode = false;
-    updateGpsButtonState(false);
+    updateGpsUi(false);
     renderPlaces();
     showToast("🏨 숙소(호텔) 기준 거리순으로 전환되었습니다.");
   }
@@ -908,7 +1056,7 @@ function renderPlaces() {
   const container = document.getElementById("placesList");
   const origin = getOriginCoords();
 
-  // Compute distances
+  // Compute straight-line distances
   let list = PLACES.map(place => {
     const dist = calculateDistance(origin.lat, origin.lng, place.lat, place.lng);
     return { ...place, distance: dist };
@@ -955,7 +1103,7 @@ function renderPlaces() {
   container.innerHTML = list.map(place => {
     const isBookmarked = bookmarks.has(place.id);
     const categoryClass = place.category;
-    const formattedDist = formatDistance(place.distance);
+    const distInfo = getDistanceDisplay(place.distance);
 
     const itemsHtml = place.targetItems && place.targetItems.length > 0
       ? `<div class="target-items">
@@ -972,6 +1120,12 @@ function renderPlaces() {
     if (place.couponInfo === "brand-check") {
       couponBadge = `<span class="badge badge-coupon-yes">쿠폰/면세 상이</span>`;
     }
+
+    // Dynamic Google Maps walking navigation link matching actual current coordinates
+    const originParam = (useGpsMode && userCoords)
+      ? `&origin=${userCoords.lat},${userCoords.lng}`
+      : `&origin=${BASECAMP.lat},${BASECAMP.lng}`;
+    const dynamicWalkNavUrl = `https://www.google.com/maps/dir/?api=1${originParam}&destination=${place.lat},${place.lng}&travelmode=walking`;
 
     return `
       <div class="place-card ${isBookmarked ? "bookmarked" : ""}" id="card-${place.id}">
@@ -998,16 +1152,19 @@ function renderPlaces() {
         </div>
 
         <div class="card-bottom">
-          <div class="distance-tag">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-            <span>${formattedDist}</span>
+          <div class="distance-tag-wrap">
+            <div class="distance-walk">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              <span>${distInfo.walkText}</span>
+            </div>
+            <div class="distance-straight">${distInfo.detailText}</div>
           </div>
 
           <div class="action-btns">
             <a href="${place.mapUrl}" target="_blank" rel="noopener noreferrer" class="nav-direct-btn" style="background:#475569;">
               지도보기
             </a>
-            <a href="${place.directNav}" target="_blank" rel="noopener noreferrer" class="nav-direct-btn">
+            <a href="${dynamicWalkNavUrl}" target="_blank" rel="noopener noreferrer" class="nav-direct-btn">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
               길찾기
             </a>
@@ -1147,8 +1304,31 @@ function updateCalculator() {
 
 // Setup Event Listeners
 function setupEventListeners() {
-  // GPS button
-  document.getElementById("gpsToggleBtn").addEventListener("click", toggleGps);
+  // GPS buttons
+  const gpsToggleBtn = document.getElementById("gpsToggleBtn");
+  if (gpsToggleBtn) {
+    gpsToggleBtn.addEventListener("click", toggleGps);
+  }
+
+  const gpsRefreshBtn = document.getElementById("gpsRefreshBtn");
+  if (gpsRefreshBtn) {
+    gpsRefreshBtn.addEventListener("click", () => {
+      fetchCurrentGps(true);
+    });
+  }
+
+  // Re-sync GPS whenever user returns to browser tab from Google Maps or external app
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && useGpsMode) {
+      fetchCurrentGps(false);
+    }
+  });
+
+  window.addEventListener("focus", () => {
+    if (useGpsMode) {
+      fetchCurrentGps(false);
+    }
+  });
 
   // Search Input
   const searchInput = document.getElementById("searchInput");
